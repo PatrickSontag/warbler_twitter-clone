@@ -113,7 +113,11 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # IMPLEMENT THIS
+    # Logs out your - PS
+    do_logout()
+    flash("Logged Out", 'info')
+
+    return redirect('/')
 
 
 ##############################################################################
