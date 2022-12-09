@@ -113,7 +113,7 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # Logs out your - PS
+    # Logs out user - PS
     do_logout()
     flash("Logged Out", 'info')
 
@@ -154,6 +154,8 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
+    # import pdb
+    # pdb.set_trace()
     return render_template('users/show.html', user=user, messages=messages)
 
 
