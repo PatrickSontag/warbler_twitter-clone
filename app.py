@@ -218,28 +218,37 @@ def profile():
     form = EditProfileForm()
     if form.validate_on_submit():
         try:
-            existing_user = User.authenticate(
-                username=form.username.data,
+            signed_in_user = User.query.get(session[CURR_USER_KEY])
+            user = User.authenticate(
+                username=signed_in_user.username,
                 password=form.password.data                
             )
+
+            if user:
+                flash("User authenticated!", "info")
+                return redirect(f"/users/{user.id}")
+
+            flash("Invalid credentials.", 'danger')
         except IntegrityError:
             flash("Password incorrect", 'danger')
             return render_template('users/show.html')
 
-        try:
-            updated_user = User(
-                username=form.username.data or existing_user.username,
-                # password=existing_user.password,
-                email=form.email.data or existing_user.email,
-                image_url=form.image_url.data or User.image_url.default.arg,
-            )
-            db.session.commit()
-        except IntegrityError:
-            flash("Could not update", 'danger')
-            return render_template('users/show.html')
+        # try:
+        #     # print("EXISITNG USER.USERNAME:", existing_user.username)
+        #     updated_user = User(
+        #         # username=existing_user.username,
+        #         # password=existing_user.password,
+        #         # email=form.email.data or existing_user.email,
+        #         image_url=form.image_url.data or User.image_url.default.arg,
+        #     )
+        #     db.session.commit()
+        # except IntegrityError:
+        #     flash("Could not update", 'danger')
+        #     return render_template('users/show.html')
 
-    else:
-        return render_template("/users/edit.html", form=form)
+    # else:
+
+    return render_template("/users/edit.html", form=form)
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():
