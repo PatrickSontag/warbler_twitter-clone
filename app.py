@@ -225,6 +225,12 @@ def profile():
             )
 
             if user:
+                if form.username.data != '':
+                    user.username = form.username.data
+
+                db.session.add(user)
+                db.session.commit()
+
                 flash("User authenticated!", "info")
                 return redirect(f"/users/{user.id}")
 
