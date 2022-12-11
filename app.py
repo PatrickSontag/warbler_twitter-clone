@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Likes
 
 CURR_USER_KEY = "curr_user"
 
@@ -249,21 +249,6 @@ def profile():
             flash("Password incorrect", 'danger')
             return render_template('users/show.html')
 
-        # try:
-        #     # print("EXISITNG USER.USERNAME:", existing_user.username)
-        #     updated_user = User(
-        #         # username=existing_user.username,
-        #         # password=existing_user.password,
-        #         # email=form.email.data or existing_user.email,
-        #         image_url=form.image_url.data or User.image_url.default.arg,
-        #     )
-        #     db.session.commit()
-        # except IntegrityError:
-        #     flash("Could not update", 'danger')
-        #     return render_template('users/show.html')
-
-    # else:
-
     return render_template("/users/edit.html", form=form)
 
 @app.route('/users/delete', methods=["POST"])
@@ -281,6 +266,39 @@ def delete_user():
 
     return redirect("/signup")
 
+@app.route('/users/add_like/<int:message_id>', methods=['POST'])
+def add_like(message_id):
+#     """Add like to message"""
+
+    if not g.user:
+        flash("Login to like a message.", "danger")
+        return redirect("/")
+
+    msg = Message.query.get_or_404(message_id)
+    g.user.likes.append(msg)
+    db.session.commit()
+
+    # import pdb
+    # pdb.set_trace()
+    return redirect("/")
+
+        # msg = Message(text=form.text.data)
+        # g.user.messages.append(msg)
+        # db.session.commit()
+
+# @app.route('/users/follow/<int:follow_id>', methods=['POST'])
+# def add_follow(follow_id):
+#     """Add a follow for the currently-logged-in user."""
+
+#     if not g.user:
+#         flash("Access unauthorized.", "danger")
+#         return redirect("/")
+
+#     followed_user = User.query.get_or_404(follow_id)
+#     g.user.following.append(followed_user)
+#     db.session.commit()
+
+#     return redirect(f"/users/{g.user.id}/following")
 
 ##############################################################################
 # Messages routes:
@@ -351,6 +369,13 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())    
+        # liked_message_ids = [f.id for lk in g.user.following]
+        # messages = (Message
+        #             .query
+        #             .filter(Message.user_id.in_(following_ids))
+        #             .order_by(Message.timestamp.desc())
+        #             .limit(100)
+        #             .all())    
 
         return render_template('home.html', messages=messages)
 
