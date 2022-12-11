@@ -224,9 +224,19 @@ def profile():
                 password=form.password.data                
             )
 
+            inputs = ["username", "email", "image_url", "header_image_url", "bio"]
+
             if user:
                 if form.username.data != '':
                     user.username = form.username.data
+                if form.email.data != '':
+                    user.email = form.email.data
+                if form.image_url.data != '':
+                    user.image_url = form.image_url.data
+                if form.header_image_url.data != '':
+                    user.header_image_url = form.header_image_url.data
+                if form.bio.data != '':
+                    user.bio = form.bio.data
 
                 db.session.add(user)
                 db.session.commit()
