@@ -154,6 +154,7 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
+
     return render_template('users/show.html', user=user, messages=messages)
 
 
@@ -179,6 +180,19 @@ def users_followers(user_id):
 
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
+
+@app.route('/users/<int:user_id>/likes')
+def user_likes(user_id):
+    """Show list of messages this user has liked."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = User.query.get_or_404(user_id)
+    messages = user.likes
+
+    return render_template('users/likes.html', user=user, messages=messages)
 
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
