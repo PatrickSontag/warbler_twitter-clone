@@ -280,6 +280,20 @@ def add_like(message_id):
 
     return redirect("/")
 
+@app.route('/users/remove_like/<int:message_id>', methods=['POST'])
+def remove_like(message_id):
+#     """Add like to message"""
+
+    if not g.user:
+        flash("Login first.", "danger")
+        return redirect("/")
+
+    msg = Message.query.get_or_404(message_id)
+    g.user.likes.remove(msg)
+    db.session.commit()
+
+    return redirect("/")
+
 ##############################################################################
 # Messages routes:
 
