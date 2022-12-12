@@ -278,27 +278,7 @@ def add_like(message_id):
     g.user.likes.append(msg)
     db.session.commit()
 
-    # import pdb
-    # pdb.set_trace()
     return redirect("/")
-
-        # msg = Message(text=form.text.data)
-        # g.user.messages.append(msg)
-        # db.session.commit()
-
-# @app.route('/users/follow/<int:follow_id>', methods=['POST'])
-# def add_follow(follow_id):
-#     """Add a follow for the currently-logged-in user."""
-
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/")
-
-#     followed_user = User.query.get_or_404(follow_id)
-#     g.user.following.append(followed_user)
-#     db.session.commit()
-
-#     return redirect(f"/users/{g.user.id}/following")
 
 ##############################################################################
 # Messages routes:
@@ -369,15 +349,10 @@ def homepage():
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())    
-        # liked_message_ids = [f.id for lk in g.user.following]
-        # messages = (Message
-        #             .query
-        #             .filter(Message.user_id.in_(following_ids))
-        #             .order_by(Message.timestamp.desc())
-        #             .limit(100)
-        #             .all())    
-
-        return render_template('home.html', messages=messages)
+        liked_msg_ids = [msg.id for msg in g.user.likes]
+        # import pdb
+        # pdb.set_trace()
+        return render_template('home.html', messages=messages, likes=liked_msg_ids)
 
     else:
         return render_template('home-anon.html')
