@@ -83,6 +83,7 @@ class UserModelTestCase(TestCase):
         self.assertEqual(len(u.following), 0)
         self.assertEqual(len(u.likes), 0)
 
+    # Following Tests
     def test_user_following(self):
         self.user1.following.append(self.user2)
         db.session.commit()
@@ -113,4 +114,11 @@ class UserModelTestCase(TestCase):
         self.assertFalse(self.user2.is_following(self.user1))
 
 
-    
+    # Signup Tests
+    def test_valid_signup(self):
+        u_test = self.user1
+        self.assertEqual(u_test.username, "testuser1")
+        self.assertEqual(u_test.email, "test1@test.com")
+        self.assertNotEqual(u_test.password, "password1")
+        # Bcrypt strings should start with $2b$
+        self.assertTrue(u_test.password.startswith("$2b$"))
