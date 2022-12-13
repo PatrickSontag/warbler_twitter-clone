@@ -7,6 +7,7 @@
 
 import os
 from unittest import TestCase
+from sqlalchemy import exc
 
 from models import db, User, Message, Follows
 
@@ -122,3 +123,24 @@ class UserModelTestCase(TestCase):
         self.assertNotEqual(u_test.password, "password1")
         # Bcrypt strings should start with $2b$
         self.assertTrue(u_test.password.startswith("$2b$"))
+
+    def test_invalid_username_signup(self):
+        invalid = User.signup(None, "test@test.com", "password", None)
+        uid = 123456789
+        invalid.id = uid
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+
+    def test_invalid_email_signup(self):
+        invalid = User.signup("testtest", None, "password", None)
+        uid = 123789
+        invalid.id = uid
+        with self.assertRaises(exc.IntegrityError) as context:
+            db.session.commit()
+    
+    def test_invalid_password_signup(self):
+        with self.assertRaises(ValueError) as context:
+            User.signup("testtest", "email@email.com", "", None)
+        
+        with self.assertRaises(ValueError) as context:
+            User.signup("testtest", "email@email.com", None, None)
