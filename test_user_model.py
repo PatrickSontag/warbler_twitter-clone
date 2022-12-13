@@ -15,7 +15,7 @@ from models import db, User, Message, Follows
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler_test"
 
 
 # Now we can import app
@@ -34,12 +34,37 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
         """Create test client, add sample data."""
+        db.drop_all()
+        db.create_all()
 
-        User.query.delete()
-        Message.query.delete()
-        Follows.query.delete()
+        user1 = User.signup("testuser1", "test1@test.com", "password1", None)
+        user_id_1 = 1000
+        user1.id = user_id_1
+
+        user2 = User.signup("testuser2", "test2@test.com", "password2", None)
+        user_id_2 = 2000
+        user2.id = user_id_2
+
+        db.session.commit()
+
+        user1 = User.query.get(user_id_1)
+        user2 = User.query.get(user_id_2)
+
+        self.user1 = user1,
+        self.user_id_1 = user_id_1
+        self.user2 = user2,
+        self.user_id_2 = user_id_2
+
+        # User.query.delete()
+        # Message.query.delete()
+        # Follows.query.delete()
 
         self.client = app.test_client()
+    
+    # def tearDown(self):
+    #     res = super().tearDown()
+    #     db.session.rollback()
+    #     return res
 
     def test_user_model(self):
         """Does basic model work?"""
@@ -49,10 +74,13 @@ class UserModelTestCase(TestCase):
             username="testuser",
             password="HASHED_PASSWORD"
         )
-
         db.session.add(u)
         db.session.commit()
 
         # User should have no messages & no followers
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
+        self.assertEqual(len(u.following), 0)
+        self.assertEqual(len(u.likes), 0)
+
+    
