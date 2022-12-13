@@ -50,9 +50,9 @@ class UserModelTestCase(TestCase):
         user1 = User.query.get(user_id_1)
         user2 = User.query.get(user_id_2)
 
-        self.user1 = user1,
+        self.user1 = user1
         self.user_id_1 = user_id_1
-        self.user2 = user2,
+        self.user2 = user2
         self.user_id_2 = user_id_2
 
         # User.query.delete()
@@ -61,10 +61,10 @@ class UserModelTestCase(TestCase):
 
         self.client = app.test_client()
     
-    # def tearDown(self):
-    #     res = super().tearDown()
-    #     db.session.rollback()
-    #     return res
+    def tearDown(self):
+        res = super().tearDown()
+        db.session.rollback()
+        return res
 
     def test_user_model(self):
         """Does basic model work?"""
@@ -77,10 +77,40 @@ class UserModelTestCase(TestCase):
         db.session.add(u)
         db.session.commit()
 
-        # User should have no messages & no followers
+        # User should have no messages, followers, following, or likes
         self.assertEqual(len(u.messages), 0)
         self.assertEqual(len(u.followers), 0)
         self.assertEqual(len(u.following), 0)
         self.assertEqual(len(u.likes), 0)
+
+    def test_user_following(self):
+        self.user1.following.append(self.user2)
+        db.session.commit()
+        print(self.user2.followers)
+        self.assertEqual(len(self.user2.followers), 1)
+        self.assertEqual(len(self.user1.following), 1)
+        self.assertEqual(len(self.user1.followers), 0)
+        self.assertEqual(len(self.user2.following), 0)
+
+    def test_is_followed_by(self):
+        self.assertFalse(self.user1.is_followed_by(self.user2))
+
+        self.user2.following.append(self.user1)
+        db.session.commit()    
+
+        self.assertTrue(self.user1.is_followed_by(self.user2))
+        self.assertFalse(self.user2.is_followed_by(self.user1))
+
+
+    def test_is_following(self):
+        
+        self.assertFalse(self.user1.is_following(self.user2))
+
+        self.user1.following.append(self.user2)
+        db.session.commit()
+
+        self.assertTrue(self.user1.is_following(self.user2))
+        self.assertFalse(self.user2.is_following(self.user1))
+
 
     
