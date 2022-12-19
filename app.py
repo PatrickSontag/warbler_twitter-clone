@@ -7,7 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from forms import UserAddForm, LoginForm, MessageForm, EditProfileForm
 from models import db, connect_db, User, Message, Likes
 
-import os
 
 CURR_USER_KEY = "curr_user"
 
